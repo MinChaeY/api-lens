@@ -6,7 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.apilens.user.domain.User;
 import com.apilens.user.dto.SignUpRequest;
+import com.apilens.user.exception.DuplicateEmailException;
 import com.apilens.user.repository.UserRepository;
+import com.apilens.user.exception.DuplicateEmailException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +22,7 @@ public class UserService {
     @Transactional
     public Long signUp(SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new DuplicateEmailException("이미 사용 중인 이메일입니다.");
         }
 
         String encodedPassword =
