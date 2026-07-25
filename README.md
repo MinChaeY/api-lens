@@ -5,13 +5,14 @@
 
 ## 프로젝트 소개
 
-API Lens는 Swagger/OpenAPI 문서를 등록하면 API 정보를 분석하고,
+API Lens는 Swagger/OpenAPI 문서를 등록하면 API 정보를 분석하고,  
 API별 테스트 케이스를 작성·실행할 수 있도록 지원하는 서비스입니다.
 
-반복적인 API 검증과 테스트 결과 정리를 효율적으로 관리하는 것을 목표로 합니다.
+반복적인 API 검증 과정과 테스트 결과를 효율적으로 관리하는 것을 목표로 합니다.
 
 ## 주요 기능
 
+- 사용자 회원가입 및 인증
 - Swagger/OpenAPI 문서 등록
 - API 엔드포인트 자동 분석
 - API별 테스트 케이스 관리
@@ -28,13 +29,16 @@ API별 테스트 케이스를 작성·실행할 수 있도록 지원하는 서�
 
 - Java 21
 - Spring Boot
+- Spring Web
 - Spring Security
 - Spring Data JPA
+- Bean Validation
 - Gradle
 
 ### Database
 
 - MySQL
+- Hibernate
 
 ### Test
 
@@ -43,6 +47,7 @@ API별 테스트 케이스를 작성·실행할 수 있도록 지원하는 서�
 
 ### 예정 기술
 
+- JWT
 - React
 - TypeScript
 - Docker
@@ -51,15 +56,32 @@ API별 테스트 케이스를 작성·실행할 수 있도록 지원하는 서�
 
 ## 개발 진행 상황
 
+### 개발 환경
+
 - [x] Spring Boot 프로젝트 초기 설정
-- [ ] MySQL 연결
-- [ ] 회원가입 및 로그인
-- [ ] JWT 인증
+- [x] MySQL 데이터베이스 연결
+- [x] 기본 패키지 구조 정리
+
+### 사용자 인증
+
+- [x] 사용자 엔티티 및 Repository 구현
+- [x] 이메일 회원가입 API 구현
+- [x] 회원가입 입력값 검증
+- [x] BCrypt 비밀번호 암호화
+- [x] 이메일 중복 검사
+- [x] 중복 이메일 예외 처리
+- [ ] 로그인 API 구현
+- [ ] JWT 발급 및 인증
+- [ ] 사용자별 데이터 접근 제어
+
+### 핵심 기능
+
 - [ ] 프로젝트 관리
-- [ ] Swagger/OpenAPI 분석
+- [ ] Swagger/OpenAPI 문서 등록
+- [ ] API 엔드포인트 분석
 - [ ] 테스트 케이스 관리
 - [ ] API 테스트 실행
-- [ ] 테스트 결과 관리
+- [ ] 테스트 결과 저장 및 조회
 - [ ] AI 테스트 케이스 생성
 - [ ] 서비스 배포
 
@@ -69,6 +91,23 @@ API별 테스트 케이스를 작성·실행할 수 있도록 지원하는 서�
 src
 ├── main
 │   ├── java
-│   │   └── com.apilens
+│   │   └── com
+│   │       └── apilens
+│   │           ├── global
+│   │           │   ├── config
+│   │           │   └── exception
+│   │           ├── user
+│   │           │   ├── controller
+│   │           │   ├── domain
+│   │           │   ├── dto
+│   │           │   ├── exception
+│   │           │   ├── repository
+│   │           │   └── service
+│   │           └── ApiLensApplication.java
 │   └── resources
+│       └── application.properties
 └── test
+    └── java
+        └── com
+            └── apilens
+```
