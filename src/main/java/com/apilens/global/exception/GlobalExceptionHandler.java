@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.apilens.user.exception.DuplicateEmailException;
+import com.apilens.user.exception.InvalidCredentialsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,4 +46,17 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(response);
     }
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(
+        InvalidCredentialsException exception
+    ) {
+        ErrorResponse response = new ErrorResponse(
+                "INVALID_CREDENTIALS",
+                exception.getMessage()
+        );
+        
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(response);
+        }
 }

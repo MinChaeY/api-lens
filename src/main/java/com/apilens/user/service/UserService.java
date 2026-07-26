@@ -9,6 +9,9 @@ import com.apilens.user.dto.SignUpRequest;
 import com.apilens.user.exception.DuplicateEmailException;
 import com.apilens.user.repository.UserRepository;
 import com.apilens.user.exception.DuplicateEmailException;
+import com.apilens.user.dto.LoginRequest;
+import com.apilens.user.dto.LoginResponse;
+import com.apilens.user.exception.InvalidCredentialsException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,5 +38,25 @@ public class UserService {
         );
 
         return userRepository.save(user).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+            .orElseThrow(() ->
+                    new InvalidCredentialsException(
+                            "이메일 또는 비밀번호가 올바르지 않습니다."
+                    )
+            );
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new InvalidCredentialsException(
+                "이메일 또는 비밀번호가 올바르지 않습니다."
+        );
+    }
+    return new LoginResponse(
+        user.getId(),
+            user.getName()
+        );
     }
 }
