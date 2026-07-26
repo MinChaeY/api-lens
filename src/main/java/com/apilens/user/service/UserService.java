@@ -12,6 +12,7 @@ import com.apilens.user.exception.DuplicateEmailException;
 import com.apilens.user.dto.LoginRequest;
 import com.apilens.user.dto.LoginResponse;
 import com.apilens.user.exception.InvalidCredentialsException;
+import com.apilens.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public Long signUp(SignUpRequest request) {
@@ -54,9 +56,11 @@ public class UserService {
                 "이메일 또는 비밀번호가 올바르지 않습니다."
         );
     }
+    String accessToken = jwtTokenProvider.createAccessToken(user);
     return new LoginResponse(
         user.getId(),
-            user.getName()
+        user.getName(),
+        accessToken
         );
     }
 }
