@@ -1,5 +1,7 @@
 package com.apilens.project.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +41,14 @@ public class ProjectService {
                 apiProjectRepository.save(project);
 
         return ProjectResponse.from(savedProject);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectResponse> getMyProjects(Long ownerId) {
+        return apiProjectRepository
+            .findAllByOwnerIdOrderByCreatedAtDesc(ownerId)
+            .stream()
+            .map(ProjectResponse::from)
+            .toList();
     }
 }
