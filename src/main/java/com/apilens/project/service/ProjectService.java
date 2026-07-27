@@ -82,4 +82,15 @@ public class ProjectService {
 
         return ProjectResponse.from(project);
     }
+    @Transactional
+    public void deleteProject(
+        Long ownerId,
+        Long projectId
+    ) {
+        ApiProject project = apiProjectRepository
+            .findByIdAndOwnerId(projectId, ownerId)
+            .orElseThrow(ProjectNotFoundException::new);
+
+        apiProjectRepository.delete(project);
+    }
 }

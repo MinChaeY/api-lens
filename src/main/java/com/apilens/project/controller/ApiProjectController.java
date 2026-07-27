@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.apilens.project.dto.CreateProjectRequest;
 import com.apilens.project.dto.ProjectResponse;
@@ -81,6 +82,16 @@ public class ApiProjectController {
         
                 return ResponseEntity.ok(response);
         }
-
+        @DeleteMapping("/{projectId}")
+        public ResponseEntity<Void> deleteProject(
+                @AuthenticationPrincipal Jwt jwt,
+                @PathVariable("projectId") Long projectId
+        ) {
+                Long ownerId = Long.valueOf(jwt.getSubject());
+        
+                projectService.deleteProject(ownerId, projectId);
+        
+                return ResponseEntity.noContent().build();
+        }
 
 }
