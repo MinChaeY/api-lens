@@ -13,6 +13,7 @@ import com.apilens.user.domain.User;
 import com.apilens.user.exception.UserNotFoundException;
 import com.apilens.user.repository.UserRepository;
 import com.apilens.project.exception.ProjectNotFoundException;
+import com.apilens.project.dto.UpdateProjectRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -63,4 +64,22 @@ public class ProjectService {
             
             return ProjectResponse.from(project);
         }
+    @Transactional
+    public ProjectResponse updateProject(
+        Long ownerId,
+        Long projectId,
+        UpdateProjectRequest request
+    ) {
+        ApiProject project = apiProjectRepository
+            .findByIdAndOwnerId(projectId, ownerId)
+            .orElseThrow(ProjectNotFoundException::new);
+
+        project.update(
+            request.name(),
+            request.baseUrl(),
+            request.description()
+        );
+
+        return ProjectResponse.from(project);
+    }
 }

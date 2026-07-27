@@ -56,6 +56,16 @@ public class ApiProject {
         this.description = description;
     }
 
+    public void update(
+            String name,
+            String baseUrl,
+            String description
+    ) {
+        this.name = name;
+        this.baseUrl = baseUrl;
+        this.description = description;
+    }
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.apilens.project.dto.CreateProjectRequest;
 import com.apilens.project.dto.ProjectResponse;
 import com.apilens.project.service.ProjectService;
+import com.apilens.project.dto.UpdateProjectRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,4 +66,21 @@ public class ApiProjectController {
 
         return ResponseEntity.ok(response);
     }
+    @PutMapping("/{projectId}")
+        public ResponseEntity<ProjectResponse> updateProject(
+                @AuthenticationPrincipal Jwt jwt,
+        @PathVariable("projectId") Long projectId,
+        @Valid @RequestBody UpdateProjectRequest request
+        ) {
+                Long ownerId = Long.valueOf(jwt.getSubject());
+        
+                ProjectResponse response = projectService.updateProject(
+                        ownerId,
+                        projectId,
+                        request);
+        
+                return ResponseEntity.ok(response);
+        }
+
+
 }
