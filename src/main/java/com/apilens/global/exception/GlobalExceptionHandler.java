@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.apilens.user.exception.DuplicateEmailException;
 import com.apilens.user.exception.InvalidCredentialsException;
 import com.apilens.user.exception.UserNotFoundException;
+import com.apilens.project.exception.ProjectNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -71,4 +72,16 @@ public class GlobalExceptionHandler {
                     exception.getMessage()
             ));
         }
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectNotFound(
+        ProjectNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse(
+                    "PROJECT_NOT_FOUND",
+                    exception.getMessage()
+            ));
+        }
+        
 }

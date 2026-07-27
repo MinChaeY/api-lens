@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.apilens.project.dto.CreateProjectRequest;
 import com.apilens.project.dto.ProjectResponse;
@@ -50,5 +51,17 @@ public class ApiProjectController {
         List<ProjectResponse> responses = projectService.getMyProjects(ownerId);
 
         return ResponseEntity.ok(responses);
-    }       
+    }
+
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectResponse> getProject(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long projectId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        ProjectResponse response = projectService.getProject(ownerId, projectId);
+
+        return ResponseEntity.ok(response);
+    }
 }

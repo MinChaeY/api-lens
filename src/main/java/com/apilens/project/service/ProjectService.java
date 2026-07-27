@@ -12,6 +12,7 @@ import com.apilens.project.repository.ApiProjectRepository;
 import com.apilens.user.domain.User;
 import com.apilens.user.exception.UserNotFoundException;
 import com.apilens.user.repository.UserRepository;
+import com.apilens.project.exception.ProjectNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,4 +52,15 @@ public class ProjectService {
             .map(ProjectResponse::from)
             .toList();
     }
+    @Transactional(readOnly = true)
+    public ProjectResponse getProject(
+        Long ownerId,
+        Long projectId
+    ) {
+        ApiProject project = apiProjectRepository
+            .findByIdAndOwnerId(projectId, ownerId)
+            .orElseThrow(ProjectNotFoundException::new);
+            
+            return ProjectResponse.from(project);
+        }
 }
