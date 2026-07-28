@@ -37,6 +37,9 @@ public class ApiProject {
 
     @Column(name = "base_url", nullable = false, length = 500)
     private String baseUrl;
+    
+    @Column(name = "open_api_url", length = 1000)
+    private String openApiUrl;
 
     @Column(length = 500)
     private String description;
@@ -70,4 +73,9 @@ public class ApiProject {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public void updateOpenApiUrl(String openApiUrl) {
+        this.openApiUrl = openApiUrl;
+    }
+
 }

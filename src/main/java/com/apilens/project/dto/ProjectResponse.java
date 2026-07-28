@@ -8,6 +8,7 @@ public record ProjectResponse(
         Long id,
         String name,
         String baseUrl,
+        String openApiUrl,
         String description,
         LocalDateTime createdAt
 ) {
@@ -17,6 +18,7 @@ public record ProjectResponse(
                 project.getId(),
                 project.getName(),
                 project.getBaseUrl(),
+                project.getOpenApiUrl(),
                 project.getDescription(),
                 project.getCreatedAt()
         );

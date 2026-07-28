@@ -19,6 +19,7 @@ import com.apilens.project.dto.CreateProjectRequest;
 import com.apilens.project.dto.ProjectResponse;
 import com.apilens.project.service.ProjectService;
 import com.apilens.project.dto.UpdateProjectRequest;
+import com.apilens.project.dto.RegisterOpenApiRequest;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,20 +73,20 @@ public class ApiProjectController {
                 @AuthenticationPrincipal Jwt jwt,
         @PathVariable("projectId") Long projectId,
         @Valid @RequestBody UpdateProjectRequest request
-        ) {
-                Long ownerId = Long.valueOf(jwt.getSubject());
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
         
-                ProjectResponse response = projectService.updateProject(
-                        ownerId,
-                        projectId,
-                        request);
+        ProjectResponse response = projectService.updateProject(
+                ownerId,
+                projectId,
+                request);
         
-                return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
         }
-        @DeleteMapping("/{projectId}")
-        public ResponseEntity<Void> deleteProject(
-                @AuthenticationPrincipal Jwt jwt,
-                @PathVariable("projectId") Long projectId
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<Void> deleteProject(
+        @AuthenticationPrincipal Jwt jwt,
+        @PathVariable("projectId") Long projectId
         ) {
                 Long ownerId = Long.valueOf(jwt.getSubject());
         
@@ -93,5 +94,21 @@ public class ApiProjectController {
         
                 return ResponseEntity.noContent().build();
         }
+    @PutMapping("/{projectId}/openapi")
+    public ResponseEntity<ProjectResponse> registerOpenApi(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @Valid @RequestBody RegisterOpenApiRequest request
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        ProjectResponse response = projectService.registerOpenApi(
+                ownerId,
+                projectId,
+                request
+        );
+
+        return ResponseEntity.ok(response);
+    }
 
 }

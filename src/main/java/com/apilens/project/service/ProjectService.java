@@ -14,6 +14,7 @@ import com.apilens.user.exception.UserNotFoundException;
 import com.apilens.user.repository.UserRepository;
 import com.apilens.project.exception.ProjectNotFoundException;
 import com.apilens.project.dto.UpdateProjectRequest;
+import com.apilens.project.dto.RegisterOpenApiRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -92,5 +93,20 @@ public class ProjectService {
             .orElseThrow(ProjectNotFoundException::new);
 
         apiProjectRepository.delete(project);
+    }
+
+    @Transactional
+    public ProjectResponse registerOpenApi(
+        Long ownerId,
+        Long projectId,
+        RegisterOpenApiRequest request
+    ) {
+        ApiProject project = apiProjectRepository
+            .findByIdAndOwnerId(projectId, ownerId)
+            .orElseThrow(ProjectNotFoundException::new);
+
+        project.updateOpenApiUrl(request.openApiUrl());
+
+        return ProjectResponse.from(project);
     }
 }
