@@ -41,6 +41,7 @@ public class ApiEndpointController {
 
         return ResponseEntity.ok(response);
     }
+
     @GetMapping
     public ResponseEntity<List<ApiEndpointResponse>> getEndpoints(
             @AuthenticationPrincipal Jwt jwt,
@@ -55,5 +56,23 @@ public class ApiEndpointController {
                 );
 
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/{endpointId}")
+    public ResponseEntity<ApiEndpointResponse> getEndpoint(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        ApiEndpointResponse response =
+                apiEndpointService.getEndpoint(
+                        ownerId,
+                        projectId,
+                        endpointId
+                );
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -9,6 +9,8 @@ import com.apilens.endpoint.dto.ApiEndpointResponse;
 import com.apilens.endpoint.repository.ApiEndpointRepository;
 import com.apilens.project.exception.ProjectNotFoundException;
 import com.apilens.project.repository.ApiProjectRepository;
+import com.apilens.endpoint.domain.ApiEndpoint;
+import com.apilens.endpoint.exception.EndpointNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,5 +35,22 @@ public class ApiEndpointService {
                 .stream()
                 .map(ApiEndpointResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ApiEndpointResponse getEndpoint(
+            Long ownerId,
+            Long projectId,
+            Long endpointId
+    ) {
+        apiProjectRepository
+                .findByIdAndOwnerId(projectId, ownerId)
+                .orElseThrow(ProjectNotFoundException::new);
+
+        ApiEndpoint endpoint = apiEndpointRepository
+                .findByIdAndProjectId(endpointId, projectId)
+                .orElseThrow(EndpointNotFoundException::new);
+
+        return ApiEndpointResponse.from(endpoint);
     }
 }

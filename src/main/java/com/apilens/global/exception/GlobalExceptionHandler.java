@@ -12,6 +12,7 @@ import com.apilens.user.exception.UserNotFoundException;
 import com.apilens.project.exception.ProjectNotFoundException;
 import com.apilens.endpoint.exception.OpenApiImportException;
 import com.apilens.endpoint.exception.OpenApiUrlNotRegisteredException;
+import com.apilens.endpoint.exception.EndpointNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -97,7 +98,7 @@ public class GlobalExceptionHandler {
                     exception.getMessage()
             ));
         }
-        
+
     @ExceptionHandler(OpenApiImportException.class)
     public ResponseEntity<ErrorResponse> handleOpenApiImport(
         OpenApiImportException exception
@@ -106,6 +107,18 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(
                     "OPENAPI_IMPORT_FAILED",
+                    exception.getMessage()
+            ));
+        }
+    
+    @ExceptionHandler(EndpointNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEndpointNotFound(
+        EndpointNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse(
+                    "ENDPOINT_NOT_FOUND",
                     exception.getMessage()
             ));
         }

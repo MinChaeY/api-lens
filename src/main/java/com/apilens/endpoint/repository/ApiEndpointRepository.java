@@ -22,6 +22,11 @@ public interface ApiEndpointRepository
                     ApiHttpMethod httpMethod,
                     String path
             );
+    Optional<ApiEndpoint>
+            findByIdAndProjectId(
+                    Long endpointId,
+                    Long projectId
+            );
 
     void deleteAllByProjectId(Long projectId);
 }
