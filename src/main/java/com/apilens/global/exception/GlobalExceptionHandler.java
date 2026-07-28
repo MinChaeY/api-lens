@@ -10,6 +10,8 @@ import com.apilens.user.exception.DuplicateEmailException;
 import com.apilens.user.exception.InvalidCredentialsException;
 import com.apilens.user.exception.UserNotFoundException;
 import com.apilens.project.exception.ProjectNotFoundException;
+import com.apilens.endpoint.exception.OpenApiImportException;
+import com.apilens.endpoint.exception.OpenApiUrlNotRegisteredException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -83,5 +85,28 @@ public class GlobalExceptionHandler {
                     exception.getMessage()
             ));
         }
+
+    @ExceptionHandler(OpenApiUrlNotRegisteredException.class)
+    public ResponseEntity<ErrorResponse> handleOpenApiUrlNotRegistered( 
+        OpenApiUrlNotRegisteredException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(
+                    "OPENAPI_URL_NOT_REGISTERED",
+                    exception.getMessage()
+            ));
+        }
         
+    @ExceptionHandler(OpenApiImportException.class)
+    public ResponseEntity<ErrorResponse> handleOpenApiImport(
+        OpenApiImportException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(
+                    "OPENAPI_IMPORT_FAILED",
+                    exception.getMessage()
+            ));
+        }
 }
