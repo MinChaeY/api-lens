@@ -1,5 +1,8 @@
 package com.apilens.testcase.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,5 +49,43 @@ public class ApiTestCaseController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<TestCaseResponse>> getTestCases(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        List<TestCaseResponse> response =
+                apiTestCaseService.getTestCases(
+                        ownerId,
+                        projectId,
+                        endpointId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{testCaseId}")
+    public ResponseEntity<TestCaseResponse> getTestCase(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId,
+            @PathVariable("testCaseId") Long testCaseId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        TestCaseResponse response =
+                apiTestCaseService.getTestCase(
+                        ownerId,
+                        projectId,
+                        endpointId,
+                        testCaseId
+                );
+
+        return ResponseEntity.ok(response);
     }
 }

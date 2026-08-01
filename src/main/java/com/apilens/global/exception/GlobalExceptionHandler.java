@@ -13,6 +13,7 @@ import com.apilens.project.exception.ProjectNotFoundException;
 import com.apilens.endpoint.exception.OpenApiImportException;
 import com.apilens.endpoint.exception.OpenApiUrlNotRegisteredException;
 import com.apilens.endpoint.exception.EndpointNotFoundException;
+import com.apilens.testcase.exception.TestCaseNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -119,6 +120,18 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.NOT_FOUND)
             .body(new ErrorResponse(
                     "ENDPOINT_NOT_FOUND",
+                    exception.getMessage()
+            ));
+        }
+
+    @ExceptionHandler(TestCaseNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTestCaseNotFound(
+        TestCaseNotFoundException exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(new ErrorResponse(
+                    "TEST_CASE_NOT_FOUND",
                     exception.getMessage()
             ));
         }
