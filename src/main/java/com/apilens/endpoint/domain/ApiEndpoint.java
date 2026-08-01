@@ -112,4 +112,14 @@ public class ApiEndpoint {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updateOpenApiInfo(
+            String summary,
+            String description,
+            String operationId
+    ) {
+        this.summary = summary;
+        this.description = description;
+        this.operationId = operationId;
+    }
 }

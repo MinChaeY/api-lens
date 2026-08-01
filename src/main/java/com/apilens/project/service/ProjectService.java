@@ -16,6 +16,7 @@ import com.apilens.project.exception.ProjectNotFoundException;
 import com.apilens.project.dto.UpdateProjectRequest;
 import com.apilens.project.dto.RegisterOpenApiRequest;
 import com.apilens.endpoint.repository.ApiEndpointRepository;
+import com.apilens.testcase.repository.ApiTestCaseRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class ProjectService {
     private final ApiProjectRepository apiProjectRepository;
     private final UserRepository userRepository;
     private final ApiEndpointRepository apiEndpointRepository;
+    private final ApiTestCaseRepository apiTestCaseRepository;
 
     @Transactional
     public ProjectResponse createProject(
@@ -94,8 +96,11 @@ public class ProjectService {
             .findByIdAndOwnerId(projectId, ownerId)
             .orElseThrow(ProjectNotFoundException::new);
 
+        apiTestCaseRepository.deleteAllByProjectId(projectId);
+
         apiEndpointRepository.deleteAllByProjectId(projectId);
-        apiProjectRepository.flush(); // Ensure endpoints are deleted before deleting the project
+        apiEndpointRepository.flush(); // Ensure endpoints are deleted before deleting the project
+     
         
         apiProjectRepository.delete(project);
     }

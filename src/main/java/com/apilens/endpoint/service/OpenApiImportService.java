@@ -2,6 +2,9 @@ package com.apilens.endpoint.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +65,22 @@ public class OpenApiImportService {
             throw new OpenApiImportException();
         }
 
-        List<ApiEndpoint> endpoints = new ArrayList<>();
+        Map<String, ApiEndpoint> existingEndpointMap =
+                apiEndpointRepository
+                        .findAllByProjectIdOrderByPathAscHttpMethodAsc(
+                                projectId
+                        )
+                        .stream()
+                        .collect(Collectors.toMap(
+                                endpoint -> createEndpointKey(
+                                        endpoint.getHttpMethod(),
+                                        endpoint.getPath()
+                                ),
+                                Function.identity()
+                        ));
+
+        List<ApiEndpoint> synchronizedEndpoints =
+                new ArrayList<>();
 
         openAPI.getPaths().forEach((path, pathItem) -> {
             if (pathItem == null) {
@@ -71,39 +89,54 @@ public class OpenApiImportService {
 
             pathItem.readOperationsMap().forEach(
                     (swaggerMethod, operation) -> {
-
                         ApiHttpMethod httpMethod =
                                 ApiHttpMethod.valueOf(
                                         swaggerMethod.name()
                                 );
 
-                        ApiEndpoint endpoint = new ApiEndpoint(
-                                project,
-                                httpMethod,
-                                path,
-                                operation.getSummary(),
-                                operation.getDescription(),
-                                operation.getOperationId()
-                        );
+                        String endpointKey =
+                                createEndpointKey(httpMethod, path);
 
-                        endpoints.add(endpoint);
+                        ApiEndpoint endpoint =
+                                existingEndpointMap.get(endpointKey);
+
+                        if (endpoint == null) {
+                            endpoint = new ApiEndpoint(
+                                    project,
+                                    httpMethod,
+                                    path,
+                                    operation.getSummary(),
+                                    operation.getDescription(),
+                                    operation.getOperationId()
+                            );
+                        } else {
+                            endpoint.updateOpenApiInfo(
+                                    operation.getSummary(),
+                                    operation.getDescription(),
+                                    operation.getOperationId()
+                            );
+                        }
+
+                        synchronizedEndpoints.add(endpoint);
                     }
             );
         });
 
-        /*
-         * 문서를 다시 불러오면 기존 엔드포인트를 지우고
-         * 최신 문서 기준으로 다시 저장한다.
-         */
-        apiEndpointRepository.deleteAllByProjectId(projectId);
-        apiEndpointRepository.flush();
-
         List<ApiEndpoint> savedEndpoints =
-                apiEndpointRepository.saveAll(endpoints);
+                apiEndpointRepository.saveAll(
+                        synchronizedEndpoints
+                );
 
         return ImportEndpointsResponse.from(
                 projectId,
                 savedEndpoints
         );
+    }
+
+    private String createEndpointKey(
+            ApiHttpMethod httpMethod,
+            String path
+    ) {
+        return httpMethod.name() + " " + path;
     }
 }
