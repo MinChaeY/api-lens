@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import com.apilens.testcase.dto.UpdateTestCaseRequest;
 import com.apilens.testcase.dto.CreateTestCaseRequest;
 import com.apilens.testcase.dto.TestCaseResponse;
+import com.apilens.testcase.dto.TestCaseRunResultResponse;
 import com.apilens.testcase.service.ApiTestCaseService;
 
 import jakarta.validation.Valid;
@@ -130,5 +131,25 @@ public class ApiTestCaseController {
         );
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{testCaseId}/run")
+    public ResponseEntity<TestCaseRunResultResponse> runTestCase(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId,
+            @PathVariable("testCaseId") Long testCaseId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        TestCaseRunResultResponse response =
+                apiTestCaseService.runTestCase(
+                        ownerId,
+                        projectId,
+                        endpointId,
+                        testCaseId
+                );
+
+        return ResponseEntity.ok(response);
     }
 }
