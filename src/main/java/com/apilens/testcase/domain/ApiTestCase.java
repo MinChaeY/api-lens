@@ -74,6 +74,20 @@ public class ApiTestCase {
         this.expectedBody = expectedBody;
     }
 
+    public void update(
+            String name,
+            String requestHeaders,
+            String requestBody,
+            Integer expectedStatus,
+            String expectedBody
+    ) {
+        this.name = name;
+        this.requestHeaders = requestHeaders;
+        this.requestBody = requestBody;
+        this.expectedStatus = expectedStatus;
+        this.expectedBody = expectedBody;
+    }
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();

@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import com.apilens.testcase.dto.UpdateTestCaseRequest;
 import com.apilens.testcase.dto.CreateTestCaseRequest;
 import com.apilens.testcase.dto.TestCaseResponse;
 import com.apilens.testcase.service.ApiTestCaseService;
@@ -84,6 +86,27 @@ public class ApiTestCaseController {
                         projectId,
                         endpointId,
                         testCaseId
+                );
+
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{testCaseId}")
+    public ResponseEntity<TestCaseResponse> updateTestCase( 
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId,
+            @PathVariable("testCaseId") Long testCaseId,
+            @Valid @RequestBody UpdateTestCaseRequest request
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        TestCaseResponse response =
+                apiTestCaseService.updateTestCase(
+                        ownerId,
+                        projectId,
+                        endpointId,
+                        testCaseId,
+                        request
                 );
 
         return ResponseEntity.ok(response);

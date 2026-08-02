@@ -15,6 +15,7 @@ import com.apilens.testcase.dto.CreateTestCaseRequest;
 import com.apilens.testcase.dto.TestCaseResponse;
 import com.apilens.testcase.exception.TestCaseNotFoundException;
 import com.apilens.testcase.repository.ApiTestCaseRepository;
+import com.apilens.testcase.dto.UpdateTestCaseRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -95,6 +96,36 @@ public class ApiTestCaseService {
         ApiTestCase testCase = apiTestCaseRepository
                 .findByIdAndEndpointId(testCaseId, endpointId)
                 .orElseThrow(TestCaseNotFoundException::new);
+
+        return TestCaseResponse.from(testCase);
+    }
+    @Transactional
+    public TestCaseResponse updateTestCase(
+            Long ownerId,
+            Long projectId,
+            Long endpointId,
+            Long testCaseId,
+            UpdateTestCaseRequest request
+    ) {
+        apiProjectRepository
+                .findByIdAndOwnerId(projectId, ownerId)
+                .orElseThrow(ProjectNotFoundException::new);
+
+        apiEndpointRepository
+                .findByIdAndProjectId(endpointId, projectId)
+                .orElseThrow(EndpointNotFoundException::new);
+
+        ApiTestCase testCase = apiTestCaseRepository
+                .findByIdAndEndpointId(testCaseId, endpointId)
+                .orElseThrow(TestCaseNotFoundException::new);
+
+        testCase.update(
+                request.name(),
+                request.requestHeaders(),
+                request.requestBody(),
+                request.expectedStatus(),
+                request.expectedBody()
+        );
 
         return TestCaseResponse.from(testCase);
     }
