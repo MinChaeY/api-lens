@@ -129,4 +129,26 @@ public class ApiTestCaseService {
 
         return TestCaseResponse.from(testCase);
     }
+    
+    @Transactional
+    public void deleteTestCase(
+            Long ownerId,
+            Long projectId,
+            Long endpointId,
+            Long testCaseId
+    ) {
+        apiProjectRepository
+                .findByIdAndOwnerId(projectId, ownerId)
+                .orElseThrow(ProjectNotFoundException::new);
+
+        apiEndpointRepository
+                .findByIdAndProjectId(endpointId, projectId)
+                .orElseThrow(EndpointNotFoundException::new);
+
+        ApiTestCase testCase = apiTestCaseRepository
+                .findByIdAndEndpointId(testCaseId, endpointId)
+                .orElseThrow(TestCaseNotFoundException::new);
+
+        apiTestCaseRepository.delete(testCase);
+    }
 }

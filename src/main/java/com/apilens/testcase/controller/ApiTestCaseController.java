@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.apilens.testcase.dto.UpdateTestCaseRequest;
 import com.apilens.testcase.dto.CreateTestCaseRequest;
@@ -110,5 +111,24 @@ public class ApiTestCaseController {
                 );
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{testCaseId}")
+    public ResponseEntity<Void> deleteTestCase(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("endpointId") Long endpointId,
+            @PathVariable("testCaseId") Long testCaseId
+    ) {
+        Long ownerId = Long.valueOf(jwt.getSubject());
+
+        apiTestCaseService.deleteTestCase(
+                ownerId,
+                projectId,
+                endpointId,
+                testCaseId
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }
