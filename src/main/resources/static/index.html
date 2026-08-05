@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Lens - API Test Dashboard</title>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. 로그인 / 회원가입 컨테이너 -->
+    <div id="auth-container" class="auth-wrapper hidden">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fa-solid fa-circle-nodes logo-icon"></i>
+                <h2>API Lens</h2>
+                <p id="auth-subtitle">프로젝트 관리를 시작하려면 로그인하세요.</p>
+            </div>
+            
+            <!-- 로그인 폼 -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">이메일 주소</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="login-email" required placeholder="name@example.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">비밀번호</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" required placeholder="비밀번호를 입력하세요">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">로그인</button>
+                <p class="auth-toggle">계정이 없으신가요? <a href="#" id="go-to-signup">회원가입</a></p>
+            </form>
+
+            <!-- 회원가입 폼 -->
+            <form id="signup-form" class="hidden">
+                <div class="form-group">
+                    <label for="signup-name">이름</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-user"></i>
+                        <input type="text" id="signup-name" required placeholder="홍길동">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">이메일 주소</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" id="signup-email" required placeholder="name@example.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">비밀번호</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="signup-password" required placeholder="8자 이상 입력하세요">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">회원가입</button>
+                <p class="auth-toggle">이미 계정이 있으신가요? <a href="#" id="go-to-login">로그인</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. 메인 대시보드 레이아웃 -->
+    <div id="app-container" class="app-layout">
+        
+        <!-- 사이드바: 프로젝트 목록 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    <span>API Lens</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="section-title-wrapper">
+                    <span class="section-title">Projects</span>
+                    <button class="btn-icon" id="btn-add-project" title="새 프로젝트 추가"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                
+                <ul class="project-list" id="project-list-ul">
+                    <!-- Dynamic project items -->
+                </ul>
+            </div>
+
+            <!-- 유저 정보 & 로그아웃 -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                    <div class="user-details">
+                        <span class="username" id="current-user-name">Loading...</span>
+                        <span class="useremail" id="current-user-email">...</span>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btn-logout" title="로그아웃">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="main-content">
+            
+            <!-- 프로젝트 미선택 시 웰컴 스크린 -->
+            <div id="welcome-view" class="welcome-screen">
+                <div class="welcome-card">
+                    <i class="fa-solid fa-magnifying-glass-chart welcome-icon"></i>
+                    <h2>API Lens 대시보드에 오신 것을 환영합니다</h2>
+                    <p>왼쪽 사이드바에서 프로젝트를 선택하거나, 새로운 프로젝트를 생성하여 API 엔드포인트 분석 및 테스트를 시작하세요.</p>
+                    <button class="btn btn-primary" id="btn-welcome-create">
+                        <i class="fa-solid fa-plus"></i> 새 프로젝트 만들기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 프로젝트 선택 시 세부 레이아웃 -->
+            <div id="project-view" class="project-layout hidden">
+                
+                <!-- 프로젝트 헤더 정보 -->
+                <header class="project-header">
+                    <div class="header-info">
+                        <h1 id="selected-project-name">Project Name</h1>
+                        <span id="selected-project-base-url" class="badge badge-base-url">http://api.example.com</span>
+                        <p id="selected-project-description" class="project-desc">Project description goes here...</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-sm" id="btn-edit-project"><i class="fa-regular fa-pen-to-square"></i> 수정</button>
+                        <button class="btn btn-danger btn-sm" id="btn-delete-project"><i class="fa-regular fa-trash-can"></i> 삭제</button>
+                    </div>
+                </header>
+
+                <!-- 콘텐츠 패널: 엔드포인트 목록 및 세부 정보 -->
+                <div class="content-panels">
+                    
+                    <!-- 왼쪽 패널: OpenAPI 임포트 & 엔드포인트 리스트 -->
+                    <section class="panel panel-left">
+                        <div class="panel-header">
+                            <h3>API Endpoints</h3>
+                        </div>
+                        
+                        <!-- OpenAPI URL 등록/업데이트 -->
+                        <div class="openapi-import-box">
+                            <label for="openapi-url-input">OpenAPI Specification URL</label>
+                            <div class="input-group">
+                                <input type="url" id="openapi-url-input" placeholder="http://example.com/api-docs">
+                                <button class="btn btn-primary btn-sm" id="btn-save-openapi">URL 저장</button>
+                            </div>
+                            <button class="btn btn-accent btn-sm btn-block hidden" id="btn-import-endpoints">
+                                <i class="fa-solid fa-file-import"></i> 명세서로부터 엔드포인트 불러오기 (Import)
+                            </button>
+                        </div>
+
+                        <!-- 엔드포인트 리스트 -->
+                        <div class="endpoint-list-container">
+                            <ul class="endpoint-list" id="endpoint-list-ul">
+                                <!-- Dynamic endpoint items -->
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- 오른쪽 패널: 테스트 케이스 및 실행 결과 -->
+                    <section class="panel panel-right">
+                        <!-- 엔드포인트 미선택 시 안내 메시지 -->
+                        <div id="endpoint-empty-view" class="empty-panel-view">
+                            <i class="fa-solid fa-network-wired"></i>
+                            <p>분석할 엔드포인트를 목록에서 선택해 주세요.</p>
+                        </div>
+
+                        <!-- 엔드포인트 선택 시 테스트 영역 -->
+                        <div id="endpoint-detail-view" class="endpoint-detail-content hidden">
+                            <!-- 엔드포인트 메타데이터 -->
+                            <div class="endpoint-meta-card">
+                                <div class="endpoint-title-row">
+                                    <span id="endpoint-method-badge" class="badge">GET</span>
+                                    <h2 id="endpoint-path-text">/api/v1/resource</h2>
+                                </div>
+                                <p id="endpoint-summary" class="endpoint-summary-text">엔드포인트 설명 요약</p>
+                                <span id="endpoint-operation-id" class="operation-id">Operation ID: getResource</span>
+                            </div>
+
+                            <!-- 테스트 케이스 섹션 -->
+                            <div class="testcases-section">
+                                <div class="section-header-row">
+                                    <h3>Test Cases</h3>
+                                    <button class="btn btn-primary btn-xs" id="btn-add-testcase">
+                                        <i class="fa-solid fa-plus"></i> 새 테스트 추가
+                                    </button>
+                                </div>
+                                
+                                <div class="testcase-flex-container">
+                                    <!-- 테스트 케이스 리스트 탭 -->
+                                    <div class="testcase-sidebar">
+                                        <ul class="testcase-tab-list" id="testcase-tab-ul">
+                                            <!-- Dynamic test case tabs -->
+                                        </ul>
+                                    </div>
+
+                                    <!-- 테스트 케이스 상세 설정 및 결과 화면 -->
+                                    <div class="testcase-main-form">
+                                        <div id="testcase-empty-detail" class="empty-testcase-detail">
+                                            <i class="fa-regular fa-folder-open"></i>
+                                            <p>테스트 케이스를 선택하거나 새로 추가해 주세요.</p>
+                                        </div>
+
+                                        <div id="testcase-content-form" class="hidden">
+                                            <h4 id="testcase-detail-title">테스트 케이스 이름</h4>
+                                            
+                                            <!-- 테스트 설정 폼 -->
+                                            <form id="testcase-detail-form">
+                                                <input type="hidden" id="testcase-id-input">
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="testcase-name-input">테스트 케이스 이름</label>
+                                                        <input type="text" id="testcase-name-input" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="testcase-expected-status">기대 응답 상태 코드 (HTTP Status)</label>
+                                                        <input type="number" id="testcase-expected-status" required min="100" max="599" placeholder="200">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="testcase-headers-input">요청 헤더 (Headers)</label>
+                                                    <textarea id="testcase-headers-input" rows="3" placeholder='Content-Type: application/json&#13;&#10;Authorization: Bearer token&#13;&#10;또는 JSON 포맷 {"Content-Type": "application/json"}'></textarea>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="testcase-body-input">요청 본문 (Request Body)</label>
+                                                    <textarea id="testcase-body-input" rows="4" placeholder='{"name": "test"}'></textarea>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="testcase-expected-body">기대 응답 본문 검증 문자열 (Expected Body - JSON Subset 또는 포함 텍스트)</label>
+                                                    <textarea id="testcase-expected-body" rows="3" placeholder='{"status": "success"}'></textarea>
+                                                </div>
+
+                                                <div class="form-actions-row">
+                                                    <button type="button" class="btn btn-danger" id="btn-delete-testcase"><i class="fa-regular fa-trash-can"></i> 삭제</button>
+                                                    <div>
+                                                        <button type="submit" class="btn btn-secondary"><i class="fa-regular fa-floppy-disk"></i> 저장</button>
+                                                        <button type="button" class="btn btn-accent" id="btn-run-testcase"><i class="fa-solid fa-play"></i> 테스트 실행 (Run)</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+
+                                            <!-- 테스트 실행 결과 출력 영역 -->
+                                            <div id="test-result-box" class="test-result-box hidden">
+                                                <div class="result-header-row">
+                                                    <h5>실행 결과 (Test Output)</h5>
+                                                    <span id="result-status-badge" class="result-badge-passed">PASSED</span>
+                                                </div>
+                                                
+                                                <div class="result-stats">
+                                                    <div class="stat-card">
+                                                        <span class="stat-label">상태 코드</span>
+                                                        <span class="stat-val" id="result-actual-status">200 OK</span>
+                                                    </div>
+                                                    <div class="stat-card">
+                                                        <span class="stat-label">소요 시간</span>
+                                                        <span class="stat-val" id="result-duration">150 ms</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 에러 메시지 발생 시 -->
+                                                <div class="result-error-msg hidden" id="result-error-container">
+                                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                                    <span id="result-error-text">연결 오류 설명</span>
+                                                </div>
+
+                                                <div class="result-body-area">
+                                                    <label>응답 헤더 (Response Headers)</label>
+                                                    <pre id="result-headers-pre">Content-Type: application/json</pre>
+                                                </div>
+
+                                                <div class="result-body-area">
+                                                    <label>응답 본문 (Response Body)</label>
+                                                    <pre id="result-body-pre">{ "id": 1 }</pre>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 3. 모달 레이어: 프로젝트 생성 / 수정 -->
+    <div id="project-modal" class="modal-wrapper hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="project-modal-title">새 프로젝트 생성</h3>
+                <button class="modal-close" id="btn-close-project-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="project-form">
+                <input type="hidden" id="project-id-input">
+                <div class="form-group">
+                    <label for="project-name-input">프로젝트명</label>
+                    <input type="text" id="project-name-input" required placeholder="Petstore Service">
+                </div>
+                <div class="form-group">
+                    <label for="project-base-url-input">Target Base URL</label>
+                    <input type="url" id="project-base-url-input" required placeholder="https://api.petstore.com">
+                </div>
+                <div class="form-group">
+                    <label for="project-desc-input">설명</label>
+                    <textarea id="project-desc-input" rows="3" placeholder="API 프로젝트에 대한 부연 설명..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-project-modal">취소</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-project-modal">생성</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
